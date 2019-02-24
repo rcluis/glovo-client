@@ -1,13 +1,14 @@
 <template>
-    <div>
-        <ul>
-            <li @click.capture="navigate(category.name)">
-                <span v-html="category.label"></span>
-                <img  v-if="isOpen" :src="category.openIcon"/>
-                <img v-else :src="category.sleepIcon"/>
-            </li>
-        </ul>
-    </div>
+        <el-card :body-style="{ padding: '0px' }">
+            <img v-if="isOpen" :src="category.openIcon" class="image"/>
+            <img v-else :src="category.sleepIcon" class="image"/>
+            <div style="padding: 14px;">
+                <span v-html="category.label"/>
+                <div class="bottom clearfix">
+                    <el-button type="text" class="button" @click.capture="navigate(category.name)">Operating button</el-button>
+                </div>
+            </div>
+        </el-card>
 </template>
 
 <script>
@@ -18,7 +19,7 @@
         },
         computed: {
             isOpen() {
-                return this.category.isOpen
+                return this.$store.getters['isCategoryOpen'](this.category.name)
             }
         },
         methods: {
