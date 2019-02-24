@@ -1,7 +1,11 @@
 <template>
     <div id="categories">
         <h1>Categories</h1>
-        <category v-for="category in categories" :key="category.id" :category="category"/>
+        <el-row>
+            <el-col v-for="category in categories" :key="category.id" :span="4" :offset="1">
+                <category :category="category"/>
+            </el-col>
+        </el-row>
     </div>
 </template>
 
@@ -25,8 +29,9 @@
                     if (!store.getters['existsCategoryInStores'](name)) {
                         await store.dispatch('fetchStores', name)
                     }
+                    const stores = store.getters['getStoresByCategory'](name)
+                    store.commit('addCategoryisOpen', { name, stores })
                 }
-                store.dispatch('updateCategories');
             }
         }
     }
