@@ -1,6 +1,11 @@
 <template>
     <div id="stores">
         <h1>Stores</h1>
+        <div class="filters">
+            <div class="filters--filter"v-for="(tag, id) in tags" :key="id">
+                <span v-html="tag"></span>
+            </div>
+        </div>
         <store v-for="store in stores" :key="store.id" :store="store"/>
     </div>
 </template>
@@ -22,6 +27,9 @@
             stores: function () {
                 return this.$store.getters['getStoresByCategory'](this.categoryName)
             },
+            tags: function () {
+                return this.$store.getters['getCategoryTags'](this.categoryName)
+            }
         },
         validate ({ params }) {
             return /^\w+$/.test(params.name) // to avoid special characters
@@ -37,6 +45,6 @@
     }
 </script>
 
-<style lang="scss">
+<style scoped>
 
 </style>

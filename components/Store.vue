@@ -3,6 +3,7 @@
         <ul>
             <li>
                 <span v-html="store.name"></span>
+                <span v-html="isOpen"></span>
             </li>
         </ul>
     </div>
@@ -14,6 +15,11 @@
         props: {
             store: Object,
         },
+        computed: {
+            isOpen() {
+                return this.$store.getters['isStoreOpen'](this.store.name)
+            }
+        }
     }
 </script>
 

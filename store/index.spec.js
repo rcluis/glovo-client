@@ -6,6 +6,9 @@ let mockAxiosResult;
 jest.mock('axios', () => ({
     $get: jest.fn(() => Promise.resolve(mockAxiosResult)),
 }));
+const mockGetters = {
+  getStoresByCategory: jest.fn(() => [])
+}
 
 const categories = [
     { id: 3, name: 'snacks' },
@@ -22,6 +25,11 @@ const stores = {
 const categoriesByIsOpen = {
     snacks: false,
     gifts: true
+}
+
+const storesByIsOpen = {
+  store1: true,
+  store2: false
 }
 
 const storesList = ['snacks', 'gifts']
@@ -79,7 +87,7 @@ describe('Store', () => {
             const categoryName = 'snacks'
             const categoryStores = stores[categoryName]
             mockAxiosResult = { stores: categoryStores }
-            await actions['fetchStores'].bind({ $axios: axios })({ commit }, categoryName)
+            await actions['fetchStores'].bind({ $axios: axios })({ commit, mockGetters }, categoryName)
             expect(commit).toHaveBeenCalledWith('addStores', { categoryName, stores: categoryStores })
             done()
         })
@@ -89,7 +97,9 @@ describe('Store', () => {
         const state = {
             stores,
             storesList,
-            categoriesByIsOpen
+            categoriesByIsOpen,
+            categoriesByTags,
+            storesByIsOpen
         }
 
         it('returns empty stores by category name', () => {
@@ -108,12 +118,16 @@ describe('Store', () => {
             expect(getters.existsCategoryInStores(state)('restaurants')).toBeFalsy()
         })
 
-        it('category is open', () => {
+        it('returns category is open', () => {
             expect(getters.isCategoryOpen(state)('gifts')).toBeTruthy()
         })
 
-        it('category is close', () => {
+        it('returns category is close', () => {
             expect(getters.isCategoryOpen(state)('snacks')).toBeFalsy()
+        })
+
+        it('returns close when category does not exists', () => {
+            expect(getters.isCategoryOpen(state)('restaurants')).toBeFalsy()
         })
 
         it('return empty filtered stores by tag', () => {
@@ -128,11 +142,24 @@ describe('Store', () => {
         })
 
         it('return empty tags from category', () => {
-
+            expect(getters.getCategoryTags(state)('gifts')).toEqual([])
         })
 
         it('return tags from category', () => {
+            const categoryName = 'snacks'
+            expect(getters.getCategoryTags(state)(categoryName)).toEqual(categoriesByTags[categoryName])
+        })
 
+        it('returns store is open', () => {
+            expect(getters.isStoreOpen(state)('store1')).toBeTruthy()
+        })
+
+        it('returns store is close', () => {
+            expect(getters.isStoreOpen(state)('store2')).toBeFalsy()
+        })
+
+        it('returns close when store does not exists', () => {
+            expect(getters.isStoreOpen(state)('store3')).toBeFalsy()
         })
     })
 })

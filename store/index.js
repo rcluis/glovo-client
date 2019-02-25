@@ -6,25 +6,34 @@ export const state = () => ({
     categoriesByIsOpen: {},
     categoriesByTags: {},
     stores: {},
-    storesList: []
+    storesList: [],
+    storesByIsOpen: {}
 })
 
 export const getters = {
     getStoresByCategory: (state) => (categoryName) => {
         return state.stores[categoryName] || []
     },
+
     existsCategoryInStores: (state) => (categoryName) => {
         return state.storesList.some((name) => name === categoryName)
     },
+
     getStoresByTag: (state) => ({categoryName, filterTag}) => {
         const stores = state.stores[categoryName]
         return stores.filter(({ tags }) => tags.some((tag) => tag === filterTag))
     },
+
     isCategoryOpen: (state) => (categoryName) => {
-        return state.categoriesByIsOpen[categoryName]
+        return state.categoriesByIsOpen[categoryName] || false
     },
+
     getCategoryTags: (state) => (categoryName) => {
         return state.categoriesByTags[categoryName] || []
+    },
+
+    isStoreOpen: (state) => (storeName) => {
+        return state.storesByIsOpen[storeName] || false
     }
 }
 
@@ -32,16 +41,20 @@ export const mutations = {
     addStores (state, { categoryName, stores }) {
         const allTags = []
         state.storesList.push(categoryName)
-        state.stores[categoryName] = stores
-        stores.forEach(({ tags }) => allTags.push(...tags))
-        const cleanedTags = new Set([...allTags])
-        state.categoriesByTags[categoryName] = [...cleanedTags]
+        stores.forEach((store) => {
+            state.storesByIsOpen[store.name] = isStoreOpen(store)
+            allTags.push(...store.tags)
+        })
+        state.stores[categoryName] = stores.sort((store) => isStoreOpen(store))
+        const tags = new Set([...allTags])
+        state.categoriesByTags[categoryName] = [...tags]
     },
 
     setCategories (state, categories) {
         state.categories = categories
     },
-    addCategoryisOpen (state, { name, stores}) {
+
+    addCategoryIsOpen (state, { name, stores}) {
         state.categoriesByIsOpen[name] = stores.some(store => isStoreOpen(store))
     },
 }
@@ -53,13 +66,12 @@ export const actions = {
     },
 
     async fetchStores({ commit, getters }, categoryName) {
-        const { stores } = await this.$axios.$get('stores', {
-            params: {
-                category: categoryName
-            }}).catch(() => {
+        console.log(getters.getStoresByCategory(categoryName))
+        const { stores } = await this.$axios
+            .$get(`stores/?category=${categoryName}`)
+            .catch(() => {
                 error({ statusCode: 404, message: 'Category not found' })
             })
-        stores.sort((store) => isStoreOpen(store))
-        commit('addStores', { categoryName, stores })
+            commit('addStores', { categoryName, stores })
     },
 }
