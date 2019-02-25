@@ -66,7 +66,6 @@ export const actions = {
     },
 
     async fetchStores({ commit, getters }, categoryName) {
-        console.log(getters.getStoresByCategory(categoryName))
         const { stores } = await this.$axios
             .$get(`stores/?category=${categoryName}`)
             .catch(() => {

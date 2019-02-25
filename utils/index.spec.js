@@ -35,4 +35,7 @@ describe('Utils', () => {
             expect(utils.isStoreOpen(store)).toBeTruthy()
         })
     })
+
+    describe('getNextOpeningTime', () =>  {
+    })
 })

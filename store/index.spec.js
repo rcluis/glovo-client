@@ -35,7 +35,7 @@ const storesByIsOpen = {
 const storesList = ['snacks', 'gifts']
 
 const categoriesByTags = {
-    snacks : ['healthy', 'med']
+    snacks: ['healthy', 'med']
 }
 
 describe('Store', () => {
@@ -52,7 +52,8 @@ describe('Store', () => {
             const state = {
                 storesList: [],
                 stores: {},
-                categoriesByTags: {}
+                categoriesByTags: {},
+                storesByIsOpen: {}
             }
             const categoryName = 'snacks'
             mutations.addStores(state, { categoryName, stores: stores[categoryName]})
@@ -67,7 +68,7 @@ describe('Store', () => {
             }
             const expected = { snacks: false }
             const categoryName = 'snacks'
-            mutations.addCategoryisOpen(state, { name: categoryName, stores: stores[categoryName]})
+            mutations.addCategoryIsOpen(state, { name: categoryName, stores: stores[categoryName]})
             expect(state.categoriesByIsOpen).toEqual(expected)
         })
     })
