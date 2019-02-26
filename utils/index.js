@@ -15,7 +15,17 @@ const isStoreOpen = ({ schedule }) => {
 }
 
 const getNextOpeningTime = ({ schedule }) => {
-    const { day: currentDay } = getTimeFormated()
+    const { day: currentDay, time: currentTime } = getTimeFormated()
+    const todayScheduleIndex = schedule.findIndex(({ day }) => day === currentDay)
+    const { open } = schedule[todayScheduleIndex]
+
+    if (currentTime <= open) {
+        return { day: currentDay, time: open }
+    }
+
+    return schedule.length - 1 > todayScheduleIndex ?
+        { day: schedule[todayScheduleIndex + 1].day, time: schedule[todayScheduleIndex + 1].open } :
+        { day: schedule[0].day, time: schedule[0].open }
 }
 export {
     isStoreOpen,
