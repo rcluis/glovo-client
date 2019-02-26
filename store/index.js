@@ -1,4 +1,4 @@
-import { isStoreOpen } from '~/utils'
+import { isStoreOpen, getNextOpeningTime } from '~/utils'
 
 // I putted all the store in a singles file because of the extension. For bigger stores, I would have ordered in modules
 export const state = () => ({
@@ -34,6 +34,10 @@ export const getters = {
 
     isStoreOpen: (state) => (storeName) => {
         return state.storesByIsOpen[storeName] || false
+    },
+
+    nextOpeningTime() {
+      return undefined;
     }
 }
 

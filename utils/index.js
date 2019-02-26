@@ -15,18 +15,39 @@ const isStoreOpen = ({ schedule }) => {
 }
 
 const getNextOpeningTime = ({ schedule }) => {
+    if (schedule.length === 0){
+        return false;
+    }
     const { day: currentDay, time: currentTime } = getTimeFormated()
-    const todayScheduleIndex = schedule.findIndex(({ day }) => day === currentDay)
+
+    const findIndex = (schedule) => {
+        return schedule.findIndex(({ day }) => day === currentDay)
+    }
+
+    let todayScheduleIndex;
+    for (let i = 0; i <= 6 - currentDay; i ++) {
+        todayScheduleIndex = schedule.findIndex(({ day }) => day === currentDay + i)
+        console.log('i: ' + i)
+        console.log(todayScheduleIndex)
+        if (todayScheduleIndex !== -1) {
+            break
+        }
+    }
+    console.log(todayScheduleIndex)
+    if (todayScheduleIndex === -1) {
+      console.log('aquii')
+        return { day: schedule[0].day, time: schedule[0].open }
+    }
+
     const { open } = schedule[todayScheduleIndex]
 
     if (currentTime <= open) {
         return { day: currentDay, time: open }
     }
 
-    return schedule.length - 1 > todayScheduleIndex ?
-        { day: schedule[todayScheduleIndex + 1].day, time: schedule[todayScheduleIndex + 1].open } :
-        { day: schedule[0].day, time: schedule[0].open }
+    return { day: schedule[todayScheduleIndex].day, time: schedule[todayScheduleIndex].open }
 }
+
 export {
     isStoreOpen,
     getTimeFormated,

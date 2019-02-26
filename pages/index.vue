@@ -22,7 +22,6 @@
             ...mapState(['categories'])
         },
         async fetch({ store }) {
-          console.log(mapState(['categories']))
             if (store.state.categories.length === 0) {
                 await store.dispatch('fetchCategories')
                 let categories = store.state.categories;
