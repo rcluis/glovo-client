@@ -36,11 +36,13 @@ const getNextOpeningTime = ({ schedule }) => {
     }
 
     const storeIndex = findStoreIndex(schedule)
-    const storeAlreadyClosedToday = currentDay === schedule[storeIndex].day && currentTime >= schedule[storeIndex].close
-    if (storeIndex === -1 || storeAlreadyClosedToday) {
+    if (storeIndex === -1) {
         return { day: schedule[0].day, time: schedule[0].open }
     }
-
+    const storeAlreadyClosedToday = currentDay === schedule[storeIndex].day && currentTime >= schedule[storeIndex].close
+    if (storeAlreadyClosedToday) {
+        return { day: schedule[0].day, time: schedule[0].open }
+    }
     const { day, open } = schedule[storeIndex]
 
     return { day: day, time: open }
