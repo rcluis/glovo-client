@@ -71,6 +71,22 @@ describe('Store', () => {
             mutations.addCategoryIsOpen(state, { name: categoryName, stores: stores[categoryName]})
             expect(state.categoriesByIsOpen).toEqual(expected)
         })
+
+        it('clear filter tag', () => {
+            const state = {
+                filteredTag: 'snacks'
+            }
+            mutations.clearFilterTags(state)
+            expect(state.filteredTag).toBeFalsy()
+        })
+
+        it('set filtered tag', () => {
+            const state = {
+                filteredTag: false
+            }
+            mutations.setFilteredTag(state, 'med')
+            expect(state.filteredTag).toBe('med')
+        })
     })
 
     describe('Actions', () => {
@@ -100,15 +116,27 @@ describe('Store', () => {
             storesList,
             categoriesByIsOpen,
             categoriesByTags,
-            storesByIsOpen
+            storesByIsOpen,
+            filteredTag: false
         }
 
         it('returns empty stores by category name', () => {
-            expect(getters.getStoresByCategory(state)('restaurants')).toEqual([])
+            expect(getters.getStores(state)('restaurants')).toEqual([])
         })
 
         it('returns stores by category name', () => {
-            expect(getters.getStoresByCategory(state)('snacks')).toEqual(stores['snacks'])
+            expect(getters.getStores(state)('snacks')).toEqual(stores['snacks'])
+        })
+
+        it('return empty filtered stores by tag', () => {
+            state.filteredTag = 'fastFood'
+            expect(getters.getStores(state)('snacks')).toEqual([])
+        })
+
+        it('return filtered stores by tag', () => {
+            state.filteredTag = 'healthy'
+            const expected = [{ id: 1, name: 'store1', tags: ['healthy'] }]
+            expect(getters.getStores(state)('snacks')).toEqual(expected)
         })
 
         it('exists category in stores list', () => {
@@ -129,17 +157,6 @@ describe('Store', () => {
 
         it('returns close when category does not exists', () => {
             expect(getters.isCategoryOpen(state)('restaurants')).toBeFalsy()
-        })
-
-        it('return empty filtered stores by tag', () => {
-            const payload = { categoryName: 'snacks', filterTag: 'healthy' }
-            const expected = [{ id: 1, name: 'store1', tags: ['healthy'] }]
-            expect(getters.getStoresByTag(state)(payload)).toEqual(expected)
-        })
-
-        it('return filtered stores by tag', () => {
-            const payload = { categoryName: 'snacks', filterTag: 'fastFood' }
-            expect(getters.getStoresByTag(state)(payload)).toEqual([])
         })
 
         it('return empty tags from category', () => {

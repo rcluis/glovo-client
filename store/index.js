@@ -2,6 +2,7 @@ import { isStoreOpen, getNextOpeningTime } from '~/utils'
 
 // I putted all the store in a singles file because of the extension. For bigger stores, I would have ordered in modules
 export const state = () => ({
+    filteredTag: false,
     categories: [],
     categoriesByIsOpen: {},
     categoriesByTags: {},
@@ -11,17 +12,14 @@ export const state = () => ({
 })
 
 export const getters = {
-    getStoresByCategory: (state) => (categoryName) => {
-        return state.stores[categoryName] || []
+    getStores: (state) => (categoryName) => {
+        const { filteredTag } = state
+        const stores = state.stores[categoryName] || []
+        return filteredTag ? stores.filter(({ tags }) => tags.some((tag) => tag === filteredTag)) : stores
     },
 
     existsCategoryInStores: (state) => (categoryName) => {
         return state.storesList.some((name) => name === categoryName)
-    },
-
-    getStoresByTag: (state) => ({categoryName, filterTag}) => {
-        const stores = state.stores[categoryName]
-        return stores.filter(({ tags }) => tags.some((tag) => tag === filterTag))
     },
 
     isCategoryOpen: (state) => (categoryName) => {
@@ -35,10 +33,6 @@ export const getters = {
     isStoreOpen: (state) => (storeName) => {
         return state.storesByIsOpen[storeName] || false
     },
-
-    nextOpeningTime() {
-      return undefined;
-    }
 }
 
 export const mutations = {
@@ -49,7 +43,7 @@ export const mutations = {
             state.storesByIsOpen[store.name] = isStoreOpen(store)
             allTags.push(...store.tags)
         })
-        state.stores[categoryName] = stores.sort((store) => isStoreOpen(store))
+        state.stores[categoryName] = stores.sort((store) => !isStoreOpen(store))
         const tags = new Set([...allTags])
         state.categoriesByTags[categoryName] = [...tags]
     },
@@ -61,6 +55,14 @@ export const mutations = {
     addCategoryIsOpen (state, { name, stores}) {
         state.categoriesByIsOpen[name] = stores.some(store => isStoreOpen(store))
     },
+
+    clearFilterTags(state) {
+        state.filteredTag = false
+    },
+
+    setFilteredTag(state, tag) {
+        state.filteredTag = tag
+    }
 }
 
 export const actions = {
@@ -69,7 +71,7 @@ export const actions = {
         commit('setCategories', categories)
     },
 
-    async fetchStores({ commit, getters }, categoryName) {
+    async fetchStores({ commit }, categoryName) {
         const { stores } = await this.$axios
             .$get(`stores/?category=${categoryName}`)
             .catch(() => {
