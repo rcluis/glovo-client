@@ -29,7 +29,7 @@
                     if (!store.getters['existsCategoryInStores'](name)) {
                         await store.dispatch('fetchStores', name)
                     }
-                    const stores = store.getters['getStoresByCategory'](name)
+                    const stores = store.getters['getStores'](name)
                     store.commit('addCategoryIsOpen', { name, stores })
                 }
             }
