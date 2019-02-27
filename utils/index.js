@@ -20,32 +20,30 @@ const getNextOpeningTime = ({ schedule }) => {
     }
     const { day: currentDay, time: currentTime } = getTimeFormated()
 
-    const findIndex = (schedule) => {
-        return schedule.findIndex(({ day }) => day === currentDay)
+    const findStoreIndex = (schedule) => {
+        let storeIndex;
+        for (let i = 0; i <= 6 - currentDay; i ++) {
+            storeIndex = schedule.findIndex(({ day }) => day === currentDay + i)
+            if (storeIndex !== -1) {
+                const { day: storeDay, open: storeOpen } = schedule[storeIndex]
+                const storeWillOpenToday = currentDay === storeDay && currentTime <= storeOpen
+                if (storeWillOpenToday || currentDay !== storeDay) {
+                    break
+                }
+            }
+        }
+        return storeIndex
     }
 
-    let todayScheduleIndex;
-    for (let i = 0; i <= 6 - currentDay; i ++) {
-        todayScheduleIndex = schedule.findIndex(({ day }) => day === currentDay + i)
-        console.log('i: ' + i)
-        console.log(todayScheduleIndex)
-        if (todayScheduleIndex !== -1) {
-            break
-        }
-    }
-    console.log(todayScheduleIndex)
-    if (todayScheduleIndex === -1) {
-      console.log('aquii')
+    const storeIndex = findStoreIndex(schedule)
+    const storeAlreadyClosedToday = currentDay === schedule[storeIndex].day && currentTime >= schedule[storeIndex].close
+    if (storeIndex === -1 || storeAlreadyClosedToday) {
         return { day: schedule[0].day, time: schedule[0].open }
     }
 
-    const { open } = schedule[todayScheduleIndex]
+    const { day, open } = schedule[storeIndex]
 
-    if (currentTime <= open) {
-        return { day: currentDay, time: open }
-    }
-
-    return { day: schedule[todayScheduleIndex].day, time: schedule[todayScheduleIndex].open }
+    return { day: day, time: open }
 }
 
 export {
