@@ -1,13 +1,10 @@
 <template>
-        <el-card :body-style="{ padding: '0px' }">
-            <img v-if="isOpen" :src="category.openIcon" class="image"/>
-            <img v-else :src="category.sleepIcon" class="image"/>
-            <div style="padding: 14px;">
-                <span v-html="category.label"/>
-                <div class="bottom clearfix">
-                    <el-button type="text" class="button" @click.capture="navigate(category.name)">Operating button</el-button>
-                </div>
-            </div>
+        <el-card class="category" shadow="hover">
+            <el-button type="text" class="button" @click.capture="navigate(category.name)">
+                <div class="category__title" v-html="category.label"/>
+                <img v-if="isOpen" :src="category.openIcon" class="category__image"/>
+                <img v-else :src="category.sleepIcon" class="category__image"/>
+            </el-button>
         </el-card>
 </template>
 
@@ -39,5 +36,18 @@
 </script>
 
 <style scoped lang="scss">
+    .category {
+        text-align: center;
+        border-radius: 75px;
+        height: 150px;
+        width: 150px;
 
+        &__title {
+            color: #2abb9b;
+        }
+
+        &__image {
+            width: 80px;
+        }
+    }
 </style>

@@ -1,14 +1,27 @@
 <template>
-    <el-container id="stores">
+    <el-container class="stores">
         <el-header>
             <h1>Stores</h1>
         </el-header>
         <el-main>
             <el-row class="stores__filters" type="flex" justify="center" :gutter="10">
                 <el-col :span="16">
-                    <el-row :gutter="20">
-                        <el-col v-for="(tag, id) in tags" :key="id" :xs="12" :sm="8" :md="4" :lg="3">
-                            <tag-filter  :tag="tag" @onTagSelected="onTagSelected"/>
+                    <el-row type="flex" :gutter="20" align="middle">
+                        <el-col v-for="(tag, index) in tags" :key="index" v-if="index < numFilters" :lg="3" :md="4" :sm="5" :xs="12">
+                            <tag-filter :tag="tag" @onTagSelected="onTagSelected"/>
+                        </el-col>
+                        <el-col v-if="isTagSelected" :lg="1" :md="2" :sm="2" :xs="4">
+                            <el-button class="stores__filters-clear" icon="el-icon-circle-close-outline" circle @click="clearFilters"></el-button>
+                        </el-col>
+                        <el-col :lg="1" :md="2" :sm="2" :xs="4">
+                            <el-dropdown v-if="showMoreFilters" trigger="click" class="stores__filters-select" @command="onTagSelected">
+                                    <i class="el-icon-more stores__filters-"></i>
+                                <el-dropdown-menu slot="dropdown">
+                                    <el-dropdown-item v-for="(tag, index) in tags" v-if="index >= numFilters" :key="index" :command="tag">
+                                        {{ tag }}
+                                    </el-dropdown-item>
+                                </el-dropdown-menu>
+                            </el-dropdown>
                         </el-col>
                     </el-row>
                 </el-col>
@@ -37,7 +50,7 @@
         },
         data() {
             return {
-                categoryName: this.$route.params.name
+                categoryName: this.$route.params.name,
             }
         },
         computed: {
@@ -46,11 +59,36 @@
             },
             tags: function () {
                 return this.$store.getters['categories/getCategoryTags'](this.categoryName)
+            },
+            numFilters: function () {
+                switch (this.$mq) {
+                    case 'xs':
+                        return 2
+                        break
+                    case 'sm':
+                        return 3
+                        break
+                    case 'md':
+                        return 4
+                        break
+                    case 'lg':
+                        return 5
+                        break
+                }
+            },
+            isTagSelected: function () {
+                return this.$store.state.stores.filters.tag
+            },
+            showMoreFilters: function () {
+                return this.tags.length > this.numFilters
             }
         },
         methods: {
             onTagSelected (tag) {
                 this.$store.commit('stores/setFilteredTag', tag)
+            },
+            clearFilters () {
+                this.$store.commit('stores/clearFilterTags')
             }
         },
         validate ({ params }) {
@@ -72,6 +110,20 @@
     .stores {
         &__filters {
             margin-bottom: 30px;
+
+            &-select {
+                cursor: pointer;
+                font-size: 30px;
+                &:focus {
+                    outline: none;
+                }
+            }
+
+            &-clear {
+                border: 0;
+                font-size: 30px;
+                padding: 0;
+            }
         }
     }
 </style>
