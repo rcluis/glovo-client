@@ -24,7 +24,7 @@
         },
         computed: {
             isOpen() {
-                return this.$store.getters['isStoreOpen'](this.store.name)
+                return this.$store.getters['stores/isStoreOpen'](this.store.name)
             },
             nextOpeningTime() {
                 return getNextOpeningTime(this.store)

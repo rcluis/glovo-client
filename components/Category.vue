@@ -19,7 +19,7 @@
         },
         computed: {
             isOpen() {
-                return this.$store.getters['isCategoryOpen'](this.category.name)
+                return this.$store.getters['categories/isCategoryOpen'](this.category.name)
             }
         },
         methods: {

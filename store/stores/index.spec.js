@@ -6,25 +6,12 @@ let mockAxiosResult;
 jest.mock('axios', () => ({
     $get: jest.fn(() => Promise.resolve(mockAxiosResult)),
 }));
-const mockGetters = {
-  getStoresByCategory: jest.fn(() => [])
-}
-
-const categories = [
-    { id: 3, name: 'snacks' },
-    { id: 2, name: 'gifts' }
-]
 
 const stores = {
     snacks : [
         { id: 1, name: 'store1', tags: ['healthy'] },
         { id: 2, name: 'store2', tags: ['med'] }
     ]
-}
-
-const categoriesByIsOpen = {
-    snacks: false,
-    gifts: true
 }
 
 const storesByIsOpen = {
@@ -34,42 +21,35 @@ const storesByIsOpen = {
 
 const storesList = ['snacks', 'gifts']
 
-const categoriesByTags = {
-    snacks: ['healthy', 'med']
-}
-
-describe('Store', () => {
+describe('Store stores', () => {
     describe('Mutations', () => {
-        it('set categories', () => {
-            const state = {
-                categories: []
-            }
-            mutations.setCategories(state, categories)
-            expect(state.categories).toEqual(categories)
-        })
-
         it('add stores', () => {
             const state = {
-                storesList: [],
                 stores: {},
-                categoriesByTags: {},
-                storesByIsOpen: {}
             }
             const categoryName = 'snacks'
             mutations.addStores(state, { categoryName, stores: stores[categoryName]})
-            expect(state.storesList).toEqual([categoryName])
             expect(state.stores).toEqual(stores)
-            expect(state.categoriesByTags).toEqual(categoriesByTags)
         })
 
-        it('add open status to categoriesByIsOpen', () => {
+        it('add stores list', () => {
             const state = {
-                categoriesByIsOpen: {}
+                storesList: [],
             }
-            const expected = { snacks: false }
             const categoryName = 'snacks'
-            mutations.addCategoryIsOpen(state, { name: categoryName, stores: stores[categoryName]})
-            expect(state.categoriesByIsOpen).toEqual(expected)
+            mutations.addStoresList(state, categoryName)
+            expect(state.storesList).toEqual([categoryName])
+        })
+
+        it('add stores by is open', () => {
+            const state = {
+                storesByIsOpen: {},
+            }
+            const name = 'store1'
+            const opened = true
+            const expected = { 'store1': opened}
+            mutations.addStoresByIsOpen(state, { name, opened})
+            expect(state.storesByIsOpen).toEqual(expected)
         })
 
         it('clear filter tag', () => {
@@ -90,22 +70,18 @@ describe('Store', () => {
     })
 
     describe('Actions', () => {
-        utils.isStoreOpen = jest.fn()
+        utils.isStoreOpen = jest.fn(() => true)
         const commit = jest.fn()
-
-        it('fetch categories', async (done) => {
-            mockAxiosResult = { categories }
-            await actions['fetchCategories'].bind({ $axios: axios })({ commit })
-            expect(commit).toHaveBeenCalledWith('setCategories', categories)
-            done()
-        })
 
         it('fetch stores', async (done) => {
             const categoryName = 'snacks'
             const categoryStores = stores[categoryName]
             mockAxiosResult = { stores: categoryStores }
-            await actions['fetchStores'].bind({ $axios: axios })({ commit, mockGetters }, categoryName)
+            await actions['fetchStores'].bind({ $axios: axios })({ commit }, categoryName)
+            expect(commit).toHaveBeenCalledWith('addStoresList', categoryName)
+            expect(commit).toHaveBeenCalledWith('addStoresByIsOpen', { name: 'store2', opened: true })
             expect(commit).toHaveBeenCalledWith('addStores', { categoryName, stores: categoryStores })
+            expect(commit).toHaveBeenCalledWith('categories/setCategoriesByTag', { categoryName, tags: ['healthy', 'med']}, { root: true })
             done()
         })
     })
@@ -114,8 +90,6 @@ describe('Store', () => {
         const state = {
             stores,
             storesList,
-            categoriesByIsOpen,
-            categoriesByTags,
             storesByIsOpen,
             filteredTag: false
         }
@@ -145,27 +119,6 @@ describe('Store', () => {
 
         it('no exists category in stores list', () => {
             expect(getters.existsCategoryInStores(state)('restaurants')).toBeFalsy()
-        })
-
-        it('returns category is open', () => {
-            expect(getters.isCategoryOpen(state)('gifts')).toBeTruthy()
-        })
-
-        it('returns category is close', () => {
-            expect(getters.isCategoryOpen(state)('snacks')).toBeFalsy()
-        })
-
-        it('returns close when category does not exists', () => {
-            expect(getters.isCategoryOpen(state)('restaurants')).toBeFalsy()
-        })
-
-        it('return empty tags from category', () => {
-            expect(getters.getCategoryTags(state)('gifts')).toEqual([])
-        })
-
-        it('return tags from category', () => {
-            const categoryName = 'snacks'
-            expect(getters.getCategoryTags(state)(categoryName)).toEqual(categoriesByTags[categoryName])
         })
 
         it('returns store is open', () => {

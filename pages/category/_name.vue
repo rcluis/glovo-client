@@ -42,25 +42,25 @@
         },
         computed: {
             stores: function () {
-                return this.$store.getters['getStores'](this.categoryName)
+                return this.$store.getters['stores/getStores'](this.categoryName)
             },
             tags: function () {
-                return this.$store.getters['getCategoryTags'](this.categoryName)
+                return this.$store.getters['categories/getCategoryTags'](this.categoryName)
             }
         },
         methods: {
             onTagSelected (tag) {
-                this.$store.commit('setFilteredTag', tag)
+                this.$store.commit('stores/setFilteredTag', tag)
             }
         },
         validate ({ params }) {
             return /^\w+$/.test(params.name) // to avoid special characters
         },
         async fetch({ store, params, error }) {
-            store.commit('clearFilterTags')
+            store.commit('stores/clearFilterTags')
             const categoryName = params.name
-            if (!store.getters['existsCategoryInStores'](categoryName)) {
-                await store.dispatch('fetchStores', categoryName).catch(() => {
+            if (!store.getters['stores/existsCategoryInStores'](categoryName)) {
+                await store.dispatch('stores/fetchStores', categoryName).catch(() => {
                     error({ statusCode: 404, message: 'Category not found' })
                 })
             }
@@ -74,6 +74,4 @@
             margin-bottom: 30px;
         }
     }
-
-
 </style>

@@ -5,7 +5,6 @@
 </template>
 
 <script>
-
     export default {
         name: 'tagFilter',
         props: {
@@ -13,7 +12,7 @@
         },
         computed: {
             isSelected() {
-                return this.$store.state.filteredTag === this.tag
+                return this.$store.state.stores.filteredTag === this.tag
             },
         },
         methods: {
