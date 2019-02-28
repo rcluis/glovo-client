@@ -1,11 +1,13 @@
 import { isStoreOpen } from '~/utils'
 
-// I putted all the store in a singles file because of the extension. For bigger stores, I would have ordered in modules
 export const state = () => ({
     filteredTag: false,
     stores: {},
     storesByIsOpen: {},
     storesList: [],
+    filters: {
+        tag: false
+    }
 })
 
 export const getters = {
@@ -14,7 +16,7 @@ export const getters = {
     },
 
     getStores: (state) => (categoryName) => {
-        const { filteredTag } = state
+        const { tag: filteredTag } = state.filters
         const stores = state.stores[categoryName] || []
         return filteredTag ? stores.filter(({ tags }) => tags.some((tag) => tag === filteredTag)) : stores
     },
@@ -38,16 +40,16 @@ export const mutations = {
   },
 
   clearFilterTags (state) {
-      state.filteredTag = false
+      state.filters.tag = false
   },
 
   setFilteredTag (state, tag) {
-      state.filteredTag = tag
+      state.filters.tag = tag
   }
 }
 
 export const actions = {
-    async fetchStores ({ commit }, categoryName) {
+    async fetchStores ({ commit, getters }, categoryName) {
         const { stores } = await this.$axios
             .$get(`stores/?category=${categoryName}`)
             .catch(() => {
@@ -60,7 +62,7 @@ export const actions = {
             commit('addStoresByIsOpen', { name: store.name, opened})
             allTags.push(...store.tags)
         })
-        const sortedStores = stores.sort((store) => !isStoreOpen(store))
+        const sortedStores = stores.sort((store) => !getters.isStoreOpen(store.name))
         commit('addStores', { categoryName, stores: sortedStores})
         const tags = new Set([...allTags])
         commit('categories/setCategoriesByTag', { categoryName, tags: [...tags]}, { root: true })

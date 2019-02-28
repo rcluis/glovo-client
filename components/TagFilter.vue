@@ -12,7 +12,7 @@
         },
         computed: {
             isSelected() {
-                return this.$store.state.stores.filteredTag === this.tag
+                return this.$store.state.stores.filters.tag === this.tag
             },
         },
         methods: {

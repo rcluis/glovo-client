@@ -16,7 +16,7 @@ const byIsOpen = {
     gifts: true
 }
 
-const categoriesByTags = {
+const byTags = {
     snacks: ['healthy', 'med']
 }
 
@@ -42,12 +42,12 @@ describe('Store categories', () => {
 
         it('set category tags', () => {
             const state = {
-              categoriesByTags: {}
+              byTags: {}
             }
             const categoryName = 'snacks'
             const tags = ['healthy', 'med']
             mutations.setCategoriesByTag(state, { categoryName,  tags})
-            expect(state.categoriesByTags).toEqual(categoriesByTags)
+            expect(state.byTags).toEqual(byTags)
         })
     })
 
@@ -65,7 +65,7 @@ describe('Store categories', () => {
     describe('Getters', () => {
         const state = {
             byIsOpen,
-            categoriesByTags,
+            byTags,
             filteredTag: false
         }
 
@@ -87,7 +87,7 @@ describe('Store categories', () => {
 
         it('return tags from category', () => {
             const categoryName = 'snacks'
-            expect(getters.getCategoryTags(state)(categoryName)).toEqual(categoriesByTags[categoryName])
+            expect(getters.getCategoryTags(state)(categoryName)).toEqual(byTags[categoryName])
         })
     })
 })

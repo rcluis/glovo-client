@@ -6,7 +6,9 @@ let mockAxiosResult;
 jest.mock('axios', () => ({
     $get: jest.fn(() => Promise.resolve(mockAxiosResult)),
 }));
-
+const mockGetters = {
+    isStoreOpen: jest.fn(() => true)
+}
 const stores = {
     snacks : [
         { id: 1, name: 'store1', tags: ['healthy'] },
@@ -54,18 +56,22 @@ describe('Store stores', () => {
 
         it('clear filter tag', () => {
             const state = {
-                filteredTag: 'snacks'
+                filters: {
+                    tag: 'snacks'
+                }
             }
             mutations.clearFilterTags(state)
-            expect(state.filteredTag).toBeFalsy()
+            expect(state.filters.tag).toBeFalsy()
         })
 
         it('set filtered tag', () => {
             const state = {
-                filteredTag: false
+                filters: {
+                    tag: false
+                }
             }
             mutations.setFilteredTag(state, 'med')
-            expect(state.filteredTag).toBe('med')
+            expect(state.filters.tag).toBe('med')
         })
     })
 
@@ -77,7 +83,7 @@ describe('Store stores', () => {
             const categoryName = 'snacks'
             const categoryStores = stores[categoryName]
             mockAxiosResult = { stores: categoryStores }
-            await actions['fetchStores'].bind({ $axios: axios })({ commit }, categoryName)
+            await actions['fetchStores'].bind({ $axios: axios })({ commit, getters: mockGetters }, categoryName)
             expect(commit).toHaveBeenCalledWith('addStoresList', categoryName)
             expect(commit).toHaveBeenCalledWith('addStoresByIsOpen', { name: 'store2', opened: true })
             expect(commit).toHaveBeenCalledWith('addStores', { categoryName, stores: categoryStores })
@@ -91,7 +97,9 @@ describe('Store stores', () => {
             stores,
             storesList,
             storesByIsOpen,
-            filteredTag: false
+            filters: {
+                tag: false
+            }
         }
 
         it('returns empty stores by category name', () => {
@@ -103,12 +111,12 @@ describe('Store stores', () => {
         })
 
         it('return empty filtered stores by tag', () => {
-            state.filteredTag = 'fastFood'
+            state.filters.tag = 'fastFood'
             expect(getters.getStores(state)('snacks')).toEqual([])
         })
 
         it('return filtered stores by tag', () => {
-            state.filteredTag = 'healthy'
+            state.filters.tag = 'healthy'
             const expected = [{ id: 1, name: 'store1', tags: ['healthy'] }]
             expect(getters.getStores(state)('snacks')).toEqual(expected)
         })
