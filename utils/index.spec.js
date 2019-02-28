@@ -1,4 +1,4 @@
-import * as utils  from '~/utils'
+import * as utils  from './index'
 
 const store = {
     id: 7,
@@ -88,6 +88,11 @@ describe('Utils', () => {
             spyOn(Date.prototype, 'getMinutes').and.returnValue('0')
             expect(utils.getNextOpeningTime(store)).toBeFalsy()
         })
+    })
 
+    describe('formatDayToString', () =>  {
+        it('returns day formatted to string', () => {
+            expect(utils.formatDayToString(0)).toEqual('Sunday')
+        })
     })
 })

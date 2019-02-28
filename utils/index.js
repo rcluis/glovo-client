@@ -48,8 +48,22 @@ const getNextOpeningTime = ({ schedule }) => {
     return { day: day, time: open }
 }
 
+const formatDayToString = (day) => {
+    const days = [
+        'Sunday',
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday'
+    ]
+    return days[day]
+}
+
 export {
     isStoreOpen,
     getTimeFormated,
-    getNextOpeningTime
+    getNextOpeningTime,
+    formatDayToString
 }
